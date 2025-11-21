@@ -1,0 +1,347 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyOIffSdRYGYM2DdCFi/E6dA",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/vianki707/sis25b/blob/main/Sisitemas%20ejercicio%201\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "import pandas as pd\n",
+        "import random\n",
+        "import numpy as np\n",
+        "from datetime import datetime, timedelta\n",
+        "\n",
+        "# Configuración\n",
+        "num_empleados = 50\n",
+        "departamentos = [\"Ventas\", \"TI\", \"Recursos Humanos\", \"Finanzas\", \"Operaciones\"]\n",
+        "cargos = [\"Analista\", \"Gerente\", \"Asistente\", \"Especialista\", \"Director\"]\n",
+        "\n",
+        "# 1. Tabla: Empleados (Maestro)\n",
+        "empleados = []\n",
+        "for i in range(1, num_empleados + 1):\n",
+        "    id_emp = f\"E{i:03d}\"\n",
+        "    nombre = f\"Empleado_{i}\"\n",
+        "    depto = random.choice(departamentos)\n",
+        "    cargo = random.choice(cargos)\n",
+        "    salario = random.randint(800, 3500)\n",
+        "    fecha_ingreso = datetime(2018, 1, 1) + timedelta(days=random.randint(0, 2000))\n",
+        "    genero = random.choice([\"M\", \"F\"])\n",
+        "    empleados.append([id_emp, nombre, depto, cargo, salario, fecha_ingreso.strftime(\"%Y-%m-%d\"), genero])\n",
+        "\n",
+        "df_empleados = pd.DataFrame(empleados, columns=[\"ID_Empleado\", \"Nombre\", \"Departamento\", \"Cargo\", \"Salario_Mensual\", \"Fecha_Ingreso\", \"Genero\"])\n",
+        "\n",
+        "# 2. Tabla: Evaluaciones de Desempeño (Hechos - Anual)\n",
+        "# Asumimos la evaluación del último año\n",
+        "evaluaciones = []\n",
+        "for emp in empleados:\n",
+        "    id_emp = emp[0]\n",
+        "    # Score 1 to 5\n",
+        "    score = random.choices([1, 2, 3, 4, 5], weights=[5, 10, 40, 35, 10])[0] # Weighted towards 3 and 4\n",
+        "    fecha_eval = \"2023-12-15\"\n",
+        "    evaluaciones.append([id_emp, fecha_eval, score])\n",
+        "\n",
+        "df_evaluaciones = pd.DataFrame(evaluaciones, columns=[\"ID_Empleado\", \"Fecha_Evaluacion\", \"Puntaje_Desempeno\"])\n",
+        "\n",
+        "# 3. Tabla: Registro de Asistencia (Hechos - Mensual Resumido)\n",
+        "# Datos de los últimos 3 meses para cada empleado\n",
+        "asistencia = []\n",
+        "meses = [\"2024-01\", \"2024-02\", \"2024-03\"]\n",
+        "\n",
+        "for emp in empleados:\n",
+        "    id_emp = emp[0]\n",
+        "    for mes in meses:\n",
+        "        dias_ausente = random.choices([0, 1, 2, 3], weights=[70, 15, 10, 5])[0]\n",
+        "        horas_extra = random.randint(0, 10)\n",
+        "        asistencia.append([id_emp, mes, dias_ausente, horas_extra])\n",
+        "\n",
+        "df_asistencia = pd.DataFrame(asistencia, columns=[\"ID_Empleado\", \"Mes\", \"Dias_Ausente\", \"Horas_Extra\"])\n"
+      ],
+      "metadata": {
+        "id": "1p-_hnckWESg"
+      },
+      "execution_count": 19,
+      "outputs": []
+    },
+    {
+      "cell_type": "code",
+      "execution_count": 20,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "UAbXKxn8Q0Tp",
+        "outputId": "39045c4a-6ace-441c-8551-18c3dcf68859"
+      },
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Empleados Head:\n",
+            "| ID_Empleado   | Nombre     | Departamento   | Cargo     | Salario_Mensual   | Fecha_Ingreso   | Genero   |\n",
+            "|:--------------|:-----------|:---------------|:----------|:------------------|:----------------|:---------|\n",
+            "| E001          | Empleado_1 | Ventas         | Director  | 3271              | 2019-08-18      | F        |\n",
+            "| E002          | Empleado_2 | TI             | Asistente | 2523              | 2022-01-11      | F        |\n",
+            "| E003          | Empleado_3 | Finanzas       | Gerente   | 2751              | 2021-12-02      | M        |\n",
+            "| E004          | Empleado_4 | Finanzas       | Gerente   | 3182              | 2018-10-14      | F        |\n",
+            "| E005          | Empleado_5 | Operaciones    | Analista  | 1808              | 2020-10-23      | M        |\n",
+            "\n",
+            "Evaluaciones Head:\n",
+            "| ID_Empleado   | Fecha_Evaluacion   | Puntaje_Desempeno   |\n",
+            "|:--------------|:-------------------|:--------------------|\n",
+            "| E001          | 2023-12-15         | 3                   |\n",
+            "| E002          | 2023-12-15         | 3                   |\n",
+            "| E003          | 2023-12-15         | 4                   |\n",
+            "| E004          | 2023-12-15         | 3                   |\n",
+            "| E005          | 2023-12-15         | 3                   |\n",
+            "\n",
+            "Asistencia Head:\n",
+            "| ID_Empleado   | Mes     | Dias_Ausente   | Horas_Extra   |\n",
+            "|:--------------|:--------|:---------------|:--------------|\n",
+            "| E001          | 2024-01 | 2              | 7             |\n",
+            "| E001          | 2024-02 | 0              | 8             |\n",
+            "| E001          | 2024-03 | 1              | 8             |\n",
+            "| E002          | 2024-01 | 0              | 5             |\n",
+            "| E002          | 2024-02 | 0              | 1             |\n"
+          ]
+        }
+      ],
+      "source": [
+        "print(\"Empleados Head:\")\n",
+        "print(df_empleados.head().to_markdown(index=False, numalign=\"left\", stralign=\"left\"))\n",
+        "print(\"\\nEvaluaciones Head:\")\n",
+        "print(df_evaluaciones.head().to_markdown(index=False, numalign=\"left\", stralign=\"left\"))\n",
+        "print(\"\\nAsistencia Head:\")\n",
+        "print(df_asistencia.head().to_markdown(index=False, numalign=\"left\", stralign=\"left\"))"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_tabla_conjunta1 = pd.merge(df_empleados, df_evaluaciones, on=\"ID_Empleado\", how=\"inner\")\n",
+        "print(df_tabla_conjunta1)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "JTegKTH3Zuu6",
+        "outputId": "110d56f6-05a3-41d3-a4a6-08e4229aa2a3"
+      },
+      "execution_count": 21,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "   ID_Empleado       Nombre      Departamento         Cargo  Salario_Mensual  \\\n",
+            "0         E001   Empleado_1            Ventas      Director             3271   \n",
+            "1         E002   Empleado_2                TI     Asistente             2523   \n",
+            "2         E003   Empleado_3          Finanzas       Gerente             2751   \n",
+            "3         E004   Empleado_4          Finanzas       Gerente             3182   \n",
+            "4         E005   Empleado_5       Operaciones      Analista             1808   \n",
+            "5         E006   Empleado_6  Recursos Humanos  Especialista              899   \n",
+            "6         E007   Empleado_7          Finanzas     Asistente             1393   \n",
+            "7         E008   Empleado_8          Finanzas     Asistente             3483   \n",
+            "8         E009   Empleado_9       Operaciones     Asistente             1160   \n",
+            "9         E010  Empleado_10            Ventas      Director             3158   \n",
+            "10        E011  Empleado_11                TI      Analista             2827   \n",
+            "11        E012  Empleado_12            Ventas     Asistente             1871   \n",
+            "12        E013  Empleado_13          Finanzas       Gerente             2074   \n",
+            "13        E014  Empleado_14          Finanzas      Analista             3395   \n",
+            "14        E015  Empleado_15  Recursos Humanos      Analista             1137   \n",
+            "15        E016  Empleado_16  Recursos Humanos  Especialista             3416   \n",
+            "16        E017  Empleado_17            Ventas      Analista             1468   \n",
+            "17        E018  Empleado_18       Operaciones      Director             2990   \n",
+            "18        E019  Empleado_19            Ventas      Director             2677   \n",
+            "19        E020  Empleado_20       Operaciones      Director             2284   \n",
+            "20        E021  Empleado_21  Recursos Humanos      Analista             2672   \n",
+            "21        E022  Empleado_22            Ventas      Analista             2464   \n",
+            "22        E023  Empleado_23          Finanzas  Especialista             2277   \n",
+            "23        E024  Empleado_24            Ventas  Especialista             1212   \n",
+            "24        E025  Empleado_25            Ventas      Director             2778   \n",
+            "25        E026  Empleado_26            Ventas       Gerente             1763   \n",
+            "26        E027  Empleado_27                TI      Analista             1876   \n",
+            "27        E028  Empleado_28            Ventas       Gerente             1914   \n",
+            "28        E029  Empleado_29  Recursos Humanos      Director             2278   \n",
+            "29        E030  Empleado_30            Ventas       Gerente             1017   \n",
+            "30        E031  Empleado_31       Operaciones       Gerente             3096   \n",
+            "31        E032  Empleado_32       Operaciones      Director             2744   \n",
+            "32        E033  Empleado_33       Operaciones     Asistente             2419   \n",
+            "33        E034  Empleado_34  Recursos Humanos     Asistente             2492   \n",
+            "34        E035  Empleado_35            Ventas       Gerente             3017   \n",
+            "35        E036  Empleado_36                TI  Especialista             3466   \n",
+            "36        E037  Empleado_37            Ventas      Director              853   \n",
+            "37        E038  Empleado_38       Operaciones      Analista             1355   \n",
+            "38        E039  Empleado_39            Ventas     Asistente             2951   \n",
+            "39        E040  Empleado_40          Finanzas      Director             2641   \n",
+            "40        E041  Empleado_41            Ventas     Asistente             1059   \n",
+            "41        E042  Empleado_42          Finanzas       Gerente             3215   \n",
+            "42        E043  Empleado_43                TI     Asistente             2878   \n",
+            "43        E044  Empleado_44       Operaciones  Especialista             1874   \n",
+            "44        E045  Empleado_45            Ventas      Director             3311   \n",
+            "45        E046  Empleado_46  Recursos Humanos  Especialista             1492   \n",
+            "46        E047  Empleado_47            Ventas  Especialista             3337   \n",
+            "47        E048  Empleado_48          Finanzas     Asistente             3394   \n",
+            "48        E049  Empleado_49       Operaciones       Gerente             2739   \n",
+            "49        E050  Empleado_50          Finanzas       Gerente             3064   \n",
+            "\n",
+            "   Fecha_Ingreso Genero Fecha_Evaluacion  Puntaje_Desempeno  \n",
+            "0     2019-08-18      F       2023-12-15                  3  \n",
+            "1     2022-01-11      F       2023-12-15                  3  \n",
+            "2     2021-12-02      M       2023-12-15                  4  \n",
+            "3     2018-10-14      F       2023-12-15                  3  \n",
+            "4     2020-10-23      M       2023-12-15                  3  \n",
+            "5     2020-03-21      F       2023-12-15                  3  \n",
+            "6     2023-02-24      M       2023-12-15                  3  \n",
+            "7     2018-10-04      M       2023-12-15                  3  \n",
+            "8     2021-04-24      F       2023-12-15                  4  \n",
+            "9     2018-08-03      M       2023-12-15                  3  \n",
+            "10    2022-01-19      F       2023-12-15                  3  \n",
+            "11    2021-09-06      M       2023-12-15                  3  \n",
+            "12    2018-03-18      F       2023-12-15                  3  \n",
+            "13    2018-03-20      F       2023-12-15                  4  \n",
+            "14    2018-05-14      F       2023-12-15                  3  \n",
+            "15    2021-01-31      F       2023-12-15                  3  \n",
+            "16    2019-04-26      F       2023-12-15                  2  \n",
+            "17    2020-12-05      F       2023-12-15                  3  \n",
+            "18    2019-03-06      F       2023-12-15                  5  \n",
+            "19    2018-11-12      F       2023-12-15                  4  \n",
+            "20    2018-01-12      F       2023-12-15                  4  \n",
+            "21    2021-01-17      F       2023-12-15                  4  \n",
+            "22    2023-06-04      F       2023-12-15                  2  \n",
+            "23    2020-08-18      F       2023-12-15                  2  \n",
+            "24    2019-04-07      F       2023-12-15                  4  \n",
+            "25    2019-08-24      M       2023-12-15                  3  \n",
+            "26    2018-08-12      F       2023-12-15                  4  \n",
+            "27    2020-05-18      F       2023-12-15                  3  \n",
+            "28    2023-03-02      F       2023-12-15                  3  \n",
+            "29    2023-02-15      M       2023-12-15                  4  \n",
+            "30    2022-02-08      F       2023-12-15                  3  \n",
+            "31    2018-06-30      F       2023-12-15                  1  \n",
+            "32    2019-03-30      M       2023-12-15                  5  \n",
+            "33    2020-03-12      M       2023-12-15                  2  \n",
+            "34    2021-12-06      F       2023-12-15                  3  \n",
+            "35    2021-10-17      F       2023-12-15                  5  \n",
+            "36    2019-07-28      M       2023-12-15                  5  \n",
+            "37    2018-09-26      F       2023-12-15                  4  \n",
+            "38    2020-12-07      M       2023-12-15                  1  \n",
+            "39    2018-02-10      M       2023-12-15                  2  \n",
+            "40    2021-09-01      F       2023-12-15                  4  \n",
+            "41    2018-10-12      M       2023-12-15                  4  \n",
+            "42    2021-09-30      F       2023-12-15                  4  \n",
+            "43    2021-12-25      F       2023-12-15                  3  \n",
+            "44    2019-09-08      M       2023-12-15                  3  \n",
+            "45    2020-07-23      M       2023-12-15                  4  \n",
+            "46    2020-03-11      F       2023-12-15                  3  \n",
+            "47    2018-01-08      M       2023-12-15                  3  \n",
+            "48    2019-10-03      F       2023-12-15                  1  \n",
+            "49    2020-02-26      F       2023-12-15                  4  \n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "n_by_state = df_asistencia.groupby(\"Dias_Ausente\")[\"ID_Empleado\"].count()\n",
+        "print(n_by_state)\n"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "4Thsf8QniWcG",
+        "outputId": "db1673a4-4ca0-4e27-e6d2-44d1759846c4"
+      },
+      "execution_count": 32,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "Dias_Ausente\n",
+            "0    104\n",
+            "1     25\n",
+            "2     15\n",
+            "3      6\n",
+            "Name: ID_Empleado, dtype: int64\n"
+          ]
+        }
+      ]
+    },
+    {
+      "cell_type": "code",
+      "source": [
+        "df_tabla_conjunta2 = pd.merge(df_empleados, df_asistencia, on=\"ID_Empleado\", how=\"inner\")\n",
+        "print(df_tabla_conjunta2)"
+      ],
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/"
+        },
+        "id": "0WUy2Rjijn22",
+        "outputId": "b4171412-f705-41e9-a96e-66e72ea6ecec"
+      },
+      "execution_count": 33,
+      "outputs": [
+        {
+          "output_type": "stream",
+          "name": "stdout",
+          "text": [
+            "    ID_Empleado       Nombre Departamento      Cargo  Salario_Mensual  \\\n",
+            "0          E001   Empleado_1       Ventas   Director             3271   \n",
+            "1          E001   Empleado_1       Ventas   Director             3271   \n",
+            "2          E001   Empleado_1       Ventas   Director             3271   \n",
+            "3          E002   Empleado_2           TI  Asistente             2523   \n",
+            "4          E002   Empleado_2           TI  Asistente             2523   \n",
+            "..          ...          ...          ...        ...              ...   \n",
+            "145        E049  Empleado_49  Operaciones    Gerente             2739   \n",
+            "146        E049  Empleado_49  Operaciones    Gerente             2739   \n",
+            "147        E050  Empleado_50     Finanzas    Gerente             3064   \n",
+            "148        E050  Empleado_50     Finanzas    Gerente             3064   \n",
+            "149        E050  Empleado_50     Finanzas    Gerente             3064   \n",
+            "\n",
+            "    Fecha_Ingreso Genero      Mes  Dias_Ausente  Horas_Extra  \n",
+            "0      2019-08-18      F  2024-01             2            7  \n",
+            "1      2019-08-18      F  2024-02             0            8  \n",
+            "2      2019-08-18      F  2024-03             1            8  \n",
+            "3      2022-01-11      F  2024-01             0            5  \n",
+            "4      2022-01-11      F  2024-02             0            1  \n",
+            "..            ...    ...      ...           ...          ...  \n",
+            "145    2019-10-03      F  2024-02             0            1  \n",
+            "146    2019-10-03      F  2024-03             0            7  \n",
+            "147    2020-02-26      F  2024-01             0            8  \n",
+            "148    2020-02-26      F  2024-02             0            4  \n",
+            "149    2020-02-26      F  2024-03             0            6  \n",
+            "\n",
+            "[150 rows x 10 columns]\n"
+          ]
+        }
+      ]
+    }
+  ]
+}
